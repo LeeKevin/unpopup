@@ -1,8 +1,12 @@
 import 'babel-polyfill'
+import Cookie from 'js-cookie'
 import './main.scss'
 
 (function unpopup() {
     const OVERLAY_DURATION = 300
+    const COOKIE_SETTINGS = {
+        expires: 7,
+    }
 
     const unpopups = Array.from(document.getElementsByClassName('unpopup')).filter(item => item.getAttribute('id'))
     let overlay
@@ -33,8 +37,14 @@ import './main.scss'
         }
     }
 
-    function closeUnpopup(el) {
-        console.log(el)
+    function findAncestor(el, cls) {
+        let parent = el.parentElement
+
+        while (parent.parentElement && !parent.classList.contains(cls)) {
+            parent = parent.parentElement
+        }
+
+        return parent.classList.contains(cls) ? parent : null
     }
 
     function initialize() {
@@ -60,40 +70,75 @@ import './main.scss'
 
             item.appendChild(close)
         })
+
+        overlay.addEventListener('click', closeVisibleUnpopups, false)
+    }
+
+    function hide(callback) {
+        const closeIcons = Array.from(document.getElementsByClassName('unpopup-close'))
+        overlay.style.opacity = 0
+        closeIcons.forEach((icon) => {
+            icon.style.opacity = 0
+        })
+        setTimeout(() => {
+            overlay.style.display = 'none'
+            closeIcons.forEach((icon) => {
+                icon.style.display = 'none'
+            })
+            if (typeof callback === 'function') callback()
+        }, OVERLAY_DURATION)
+    }
+
+    function show(callback) {
+        const closeIcons = Array.from(document.getElementsByClassName('unpopup-close'))
+        overlay.style.display = 'block'
+        closeIcons.forEach((icon) => {
+            icon.style.display = 'block'
+        })
+        setTimeout(() => {
+            overlay.style.opacity = 1
+            closeIcons.forEach((icon) => {
+                icon.style.opacity = 1
+            })
+            if (typeof callback === 'function') callback()
+        }, OVERLAY_DURATION)
+    }
+
+    function closeUnpopup(e) {
+        const container = findAncestor(e.target, 'unpopup')
+        if (container) {
+            const id = container.getAttribute('id')
+            hide(() => {
+                Cookie.set(`unpopup-${id}`, '1', COOKIE_SETTINGS)
+            })
+        }
+    }
+
+    function closeVisibleUnpopups() {
+        const visible = unpopups.filter(isVisible)
+
+        hide(() => {
+            visible.forEach((item) => {
+                const id = item.getAttribute('id')
+                Cookie.set(`unpopup-${id}`, '1', COOKIE_SETTINGS)
+            })
+        })
     }
 
     let transitioning = false
     const listener = debounce(() => {
         if (transitioning) return
-        const popupVisible = unpopups.some(isVisible)
-        const closeIcons = Array.from(document.getElementsByClassName('unpopup-close'))
-
+        const popupVisible = unpopups.some(item => isVisible(item) && !Cookie.get(`unpopup-${item.getAttribute('id')}`))
         if (popupVisible) {
             transitioning = true
-            overlay.style.display = 'block'
-            closeIcons.forEach((icon) => {
-                icon.style.display = 'block'
-            })
-            setTimeout(() => {
-                overlay.style.opacity = 1
-                closeIcons.forEach((icon) => {
-                    icon.style.opacity = 1
-                })
+            show(() => {
                 transitioning = false
-            }, OVERLAY_DURATION)
+            })
         } else {
             transitioning = true
-            overlay.style.opacity = 0
-            closeIcons.forEach((icon) => {
-                icon.style.opacity = 0
-            })
-            setTimeout(() => {
-                overlay.style.display = 'none'
-                closeIcons.forEach((icon) => {
-                    icon.style.display = 'none'
-                })
+            hide(() => {
                 transitioning = false
-            }, OVERLAY_DURATION)
+            })
         }
     }, OVERLAY_DURATION / 4)
 
