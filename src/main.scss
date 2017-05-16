@@ -1,0 +1,40 @@
+.unpopup {
+  position: relative;
+  z-index: 999 !important;
+}
+
+.unpopup-close {
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .8);
+  width: 20px;
+  display: none;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  z-index: 999 !important;
+  opacity: 0;
+  cursor: pointer;
+
+  svg {
+    display: block;
+  }
+
+  path {
+    stroke: #ffffff;
+    fill: transparent;
+    stroke-linecap: round;
+    stroke-width: 5;
+  }
+}
+
+.unpopup-overlay {
+  display: none;
+  position: fixed;
+  background: rgba(0, 0, 0, .6);
+  opacity: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 998;
+}

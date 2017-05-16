@@ -1,0 +1,20 @@
+{
+  "extends": "./lint/index.js",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "class-methods-use-this": [
+      "error",
+      {
+        "exceptMethods": [
+          "componentWillMount",
+          "componentDidMount",
+          "componentWillUnmount",
+          "render"
+        ]
+      }
+    ]
+  }
+}

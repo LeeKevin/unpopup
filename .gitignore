@@ -1,0 +1,14 @@
+# vim
+.*.sw*
+
+# IDE
+.idea
+
+# Shell
+*.sh
+*.*tar*
+
+*.log
+*.csv
+
+node_modules/
