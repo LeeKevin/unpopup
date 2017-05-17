@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import Cookie from 'js-cookie'
 import './main.scss'
 

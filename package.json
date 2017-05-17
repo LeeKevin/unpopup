@@ -32,7 +32,6 @@
     "webpack": "^1.14.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.20.0",
     "js-cookie": "^2.1.4"
   }
 }
